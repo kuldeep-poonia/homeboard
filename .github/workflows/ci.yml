@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-checks:
+    name: Backend Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Go Vet
+        run: |
+          cd backend
+          go vet ./...
+
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          go test -v -race ./...
+
+  frontend-checks:
+    name: Frontend Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          cd tv-app
+          npm ci || npm install
+
+      - name: TypeScript Type Check
+        run: |
+          cd tv-app
+          npm run typecheck

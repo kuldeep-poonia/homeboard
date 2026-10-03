@@ -1,0 +1,59 @@
+# Hackathon internal instructions and plans
+build_plan.md
+instruction.md
+security.md
+testing.md
+
+# Environment and secrets
+.env
+*.env
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+secret/
+secrets/
+
+# Database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Binaries and build outputs
+/backend/bin/
+/backend/tmp/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Node / Web / TV App
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+.cache/
+.metro/
+.expo/
+*.tsbuildinfo
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
