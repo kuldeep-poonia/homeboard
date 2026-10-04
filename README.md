@@ -93,6 +93,43 @@ Type or speak the way you normally talk to a family member:
 
 ---
 
+---
+
+## 📺 How to Use on Your Fire TV (End-User Guide)
+
+You do **not** need complex developer tools to use HomeBoard in your living room. There are two simple ways to run it on any Amazon Fire TV:
+
+### Method 1: The Instant 10-Second Way (Amazon Silk Browser — Recommended)
+Every Amazon Fire TV has Amazon's built-in **Silk Browser** (Internet):
+
+1. **Open Silk Browser:** Press and hold the Alexa microphone button on your Fire TV remote and say: **"Alexa, open Silk Browser"** (or click the *Internet* app on the Fire TV Home Screen).
+2. **Enter Your URL:** In the address bar, type your live HomeBoard URL (e.g., `https://homeboard.onrender.com/tv`).
+3. **Full Screen & Pin to Home:**
+   * Press the **Menu button** (three horizontal lines `☰`) on your Fire TV remote and select **Full Screen**.
+   * Click **"Pin to Home"** or **"Add Bookmark"** so HomeBoard appears right on your Fire TV home screen like a native app.
+4. **Done!** The 10-foot ambient board is live. You can immediately navigate items with your Fire TV remote D-pad and scan the corner QR with your phone.
+
+---
+
+### Method 2: Installing as a Native App (APK / Appstore)
+
+* **Official Amazon Appstore (Production):** Once published to the Amazon Appstore, users simply say: **"Alexa, download HomeBoard"** to install with 1 click.
+* **Sideloading via "Downloader" App (For Testing Today):**
+  1. On your Fire TV, install the free **Downloader** app from the Amazon Appstore.
+  2. Go to **Settings ➔ My Fire TV ➔ Developer Options ➔ Install unknown apps** and turn it **ON** for Downloader.
+  3. Open Downloader, enter the direct link to the `HomeBoard.apk` (from GitHub Releases), and click **Install**.
+  4. The app will appear in **Your Apps & Channels** on Fire TV with its native leanback launcher icon.
+* **Developer ADB Push (Over Wi-Fi):**
+  ```bash
+  # Connect to your Fire TV over your home Wi-Fi (IP is in Settings > About > Network)
+  adb connect 192.168.1.XX:5555
+
+  # Install the native app directly
+  adb install HomeBoard.apk
+  ```
+
+---
+
 ## 🎮 Fire TV Remote & Keyboard Controls
 
 You don't need a mouse or keyboard. The TV app is 100% controllable with the standard **Amazon Fire TV remote control**:
