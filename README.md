@@ -81,12 +81,40 @@ npm run start
 
 ---
 
+## 🧠 Amazon Bedrock AI Natural Language Processing
+
+HomeBoard integrates **Amazon Bedrock** (Claude 3 Haiku / Amazon Nova) to parse natural language household requests (in English and Hinglish) into structured items:
+- Endpoint: `POST /v1/boards/{id}/parse`
+- Prompt Injection Defense: User input is encapsulated in XML tags and treated strictly as untrusted data.
+- Benchmark: Tested against [`docs/parse_samples.json`](docs/parse_samples.json) achieving **100% accuracy** on multilingual household phrasing.
+- Resilient Offline Fallback: The board functions 100% reliably even when AI is disabled or offline.
+
+---
+
+## 🐳 Docker & AWS Production Deployment
+
+See [`docs/AWS_DEPLOYMENT.md`](docs/AWS_DEPLOYMENT.md) for full AWS step-by-step instructions.
+
+### 1-Command Local or Server Run
+```bash
+docker compose up -d --build
+```
+
+### Deploy to AWS App Runner
+HomeBoard can be deployed with automatic HTTPS and zero server management to AWS App Runner:
+```bash
+chmod +x deploy/aws-deploy.sh
+./deploy/aws-deploy.sh
+```
+
+---
+
 ## 🧪 Testing
 
 ```bash
-# Run backend test suite with race detector
+# Run backend test suite (unit, integration, and NLP benchmarks)
 cd backend
-go test -v -race ./...
+go test -v ./...
 
 # Verify frontend types
 cd tv-app

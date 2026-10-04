@@ -1,0 +1,28 @@
+services:
+  homeboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: homeboard-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/homeboard.db
+      - APP_ENV=production
+      - BASE_URL=http://localhost:8080
+      - BEDROCK_ENABLED=true
+      - AWS_REGION=us-east-1
+      - BEDROCK_MODEL_ID=anthropic.claude-3-haiku-20240307-v1:0
+      # Provide AWS credentials if running locally outside an IAM instance role
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+    volumes:
+      - homeboard-data:/app/data
+
+volumes:
+  homeboard-data:
+    driver: local

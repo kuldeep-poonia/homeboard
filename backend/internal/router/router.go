@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kuldeep-poonia/homeboard/backend/internal/ai"
 	"github.com/kuldeep-poonia/homeboard/backend/internal/config"
 	"github.com/kuldeep-poonia/homeboard/backend/internal/db"
 	"github.com/kuldeep-poonia/homeboard/backend/internal/handlers"
@@ -25,6 +26,8 @@ func NewRouter(cfg *config.Config, database *db.DB, hub *ws.Hub) http.Handler {
 	joinH := handlers.NewJoinHandler(cfg, database, hub, redeemLimiter)
 	wsH := handlers.NewWSHandler(database, hub)
 	qrH := handlers.NewQRHandler(cfg)
+	aiParser := ai.NewParser(cfg)
+	parseH := handlers.NewParseHandler(database, aiParser)
 
 	mux := http.NewServeMux()
 
@@ -49,6 +52,9 @@ func NewRouter(cfg *config.Config, database *db.DB, hub *ws.Hub) http.Handler {
 			switch parts[1] {
 			case "items":
 				itemsH.ServeHTTP(w, r)
+				return
+			case "parse":
+				parseH.ServeHTTP(w, r)
 				return
 			case "ws":
 				wsH.ServeHTTP(w, r)

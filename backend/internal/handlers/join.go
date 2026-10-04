@@ -145,9 +145,11 @@ func phoneWebHTML(initialToken string) string {
     .status-badge.err { background: rgba(218, 54, 51, 0.2); color: var(--danger); }
     
     .panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-    .type-btn { background: #21262d; border: 1px solid var(--border); color: var(--text-muted); padding: 10px 4px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .type-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
+    .type-btn { background: #21262d; border: 1px solid var(--border); color: var(--text-muted); padding: 8px 2px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s; }
     .type-btn.active { background: #1f6feb; color: #fff; border-color: #58a6ff; }
+    .type-btn.ai { border-color: #d29922; color: #e3b341; }
+    .type-btn.ai.active { background: #9e6a03; color: #fff; border-color: #d29922; }
     
     .input-group { display: flex; flex-direction: column; gap: 10px; }
     input[type="text"] { width: 100%; background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s; }
@@ -169,6 +171,7 @@ func phoneWebHTML(initialToken string) string {
     .empty-state { text-align: center; color: var(--text-muted); padding: 32px 16px; font-size: 0.9rem; }
     .msg-banner { padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem; display: none; }
     .msg-banner.error { background: rgba(218,54,51,0.15); border: 1px solid var(--danger); color: #f85149; display: block; }
+    .msg-banner.info { background: rgba(88,166,255,0.15); border: 1px solid var(--primary); color: #58a6ff; display: block; }
   </style>
 </head>
 <body>
@@ -185,9 +188,10 @@ func phoneWebHTML(initialToken string) string {
       <button type="button" class="type-btn" data-type="shopping">Shopping</button>
       <button type="button" class="type-btn" data-type="event">Event</button>
       <button type="button" class="type-btn" data-type="movie">Movie</button>
+      <button type="button" class="type-btn ai" data-type="auto">✨ AI Auto</button>
     </div>
     <form id="itemForm" class="input-group">
-      <input type="text" id="itemTextInput" placeholder="Add to TV..." maxlength="200" autocomplete="off" required>
+      <input type="text" id="itemTextInput" placeholder="Add note or type naturally..." maxlength="200" autocomplete="off" required>
       <button type="submit" id="btnSubmit" class="btn-send">
         <span>Post to TV</span>
       </button>
@@ -373,10 +377,28 @@ func phoneWebHTML(initialToken string) string {
 
       btnSubmit.disabled = true;
       try {
+        let postType = selectedType;
+        let postText = text;
+        let whenTS = null;
+
+        if (selectedType === "auto") {
+          const parseRes = await fetch("/v1/boards/" + currentBoardId + "/parse", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text })
+          });
+          if (parseRes.ok) {
+            const parsed = await parseRes.json();
+            postType = parsed.type || "reminder";
+            postText = parsed.text || text;
+            whenTS = parsed.when_ts;
+          }
+        }
+
         const res = await fetch("/v1/boards/" + currentBoardId + "/items", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: selectedType, text: text })
+          body: JSON.stringify({ type: postType, text: postText, when_ts: whenTS })
         });
         if (res.ok) {
           itemInput.value = "";

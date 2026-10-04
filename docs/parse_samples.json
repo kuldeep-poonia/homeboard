@@ -1,0 +1,102 @@
+[
+  {
+    "input": "Buy organic almond milk and eggs from store",
+    "expected_type": "shopping",
+    "description": "Standard shopping intent with multiple items"
+  },
+  {
+    "input": "Kal sham ko sabzi aur doodh lana",
+    "expected_type": "shopping",
+    "description": "Hinglish grocery item"
+  },
+  {
+    "input": "Watch Inception on Prime Video with family tonight",
+    "expected_type": "movie",
+    "description": "Standard movie streaming intent"
+  },
+  {
+    "input": "Weekend pe Stree 2 movie dekhna hai",
+    "expected_type": "movie",
+    "description": "Hinglish movie watch request"
+  },
+  {
+    "input": "Annual society meeting this Sunday at 11 AM",
+    "expected_type": "event",
+    "description": "Event with scheduled time"
+  },
+  {
+    "input": "Dr. Sharma dentist appointment on Tuesday",
+    "expected_type": "event",
+    "description": "Medical appointment event"
+  },
+  {
+    "input": "Rohan ki shaadi reception on 15th October",
+    "expected_type": "event",
+    "description": "Hinglish wedding event"
+  },
+  {
+    "input": "Take vitamin D tablet after breakfast",
+    "expected_type": "reminder",
+    "description": "Daily medication reminder"
+  },
+  {
+    "input": "Kal subah 6:30 baje train yaad dilao",
+    "expected_type": "event",
+    "description": "Hinglish train travel event/reminder"
+  },
+  {
+    "input": "Water the balcony plants",
+    "expected_type": "reminder",
+    "description": "Household chore reminder"
+  },
+  {
+    "input": "Purchase fresh bread and butter",
+    "expected_type": "shopping",
+    "description": "Grocery purchase"
+  },
+  {
+    "input": "Front door security lock battery low",
+    "expected_type": "status",
+    "description": "Household hardware status update"
+  },
+  {
+    "input": "Living room AC filter cleaning due",
+    "expected_type": "reminder",
+    "description": "Maintenance reminder"
+  },
+  {
+    "input": "Watch Champions League football match at 9pm",
+    "expected_type": "movie",
+    "description": "Watch entertainment broadcast"
+  },
+  {
+    "input": "Guest Wi-Fi network mode enabled",
+    "expected_type": "status",
+    "description": "Home network status"
+  },
+  {
+    "input": "Pay electricity bill before 10th",
+    "expected_type": "reminder",
+    "description": "Financial bill reminder"
+  },
+  {
+    "input": "Bazaar se aate waqt fruits khareedna",
+    "expected_type": "shopping",
+    "description": "Hinglish shopping errand"
+  },
+  {
+    "input": "Priya birthday party celebration on Saturday",
+    "expected_type": "event",
+    "description": "Birthday event"
+  },
+  {
+    "input": "Main gate status closed for night",
+    "expected_type": "status",
+    "description": "Security status"
+  },
+  {
+    "input": "Buy coffee beans and oat milk",
+    "expected_type": "shopping",
+    "description": "Coffee ingredients shopping"
+  }
+]
