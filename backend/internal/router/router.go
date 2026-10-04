@@ -29,18 +29,30 @@ func NewRouter(cfg *config.Config, database *db.DB, hub *ws.Hub) http.Handler {
 	aiParser := ai.NewParser(cfg)
 	parseH := handlers.NewParseHandler(database, aiParser)
 
+	tvH := handlers.NewTVHandler(cfg.BaseURL)
+
 	mux := http.NewServeMux()
 
 	// 1. Health check
 	mux.HandleFunc("/healthz", healthH)
 
-	// 2. QR Image generation
+	// 2. Fire TV 10-foot ambient display
+	mux.Handle("/tv", tvH)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			http.Redirect(w, r, "/tv", http.StatusFound)
+			return
+		}
+		middleware.JSONError(w, "not found", http.StatusNotFound)
+	})
+
+	// 3. QR Image generation
 	mux.Handle("/qr/", qrH)
 
-	// 3. Mobile web onboarding page
+	// 4. Mobile web onboarding page
 	mux.HandleFunc("/j/", joinH.ServePhonePage)
 
-	// 4. Token redemption
+	// 5. Token redemption
 	mux.HandleFunc("/v1/join/redeem", joinH.Redeem)
 
 	// 5. REST & WebSocket board routes
