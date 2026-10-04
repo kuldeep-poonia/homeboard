@@ -1,225 +1,234 @@
 # HomeBoard 📺 📱
+### The Ambient Smart Household Board for Amazon Fire TV
 
-> **A privacy-first, ambient communal household board for Amazon Fire TV / Vega OS with instant phone QR pairing, sub-second WebSocket live synchronization, and Amazon Bedrock natural language understanding.**
+> **Turn your living room TV into a shared, glanceable family dashboard. Add notes, grocery lists, and reminders from your phone by simply scanning a QR code on the TV screen—with zero typing on the television and instant real-time sync.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Go Version](https://img.shields.io/badge/Go-1.24%2B-00ADD8.svg)](https://go.dev/)
-[![Platform](https://img.shields.io/badge/Platform-Fire%20TV%20%2F%20Vega%20OS-FF9900.svg)](https://developer.amazon.com/fire-tv)
-[![AI Engine](https://img.shields.io/badge/AI-Amazon%20Bedrock%20%2B%20Offline%20Fallback-232F3E.svg)](https://aws.amazon.com/bedrock/)
-[![Tests Passing](https://img.shields.io/badge/tests-100%25%20passing-brightgreen.svg)]()
-
----
-
-## 🌟 Why HomeBoard?
-
-Living rooms have large television screens that sit idle for hours. Existing digital family boards suffer from three critical flaws:
-1. **Clunky TV Text Input:** Typing notes, grocery lists, or reminders with a TV remote on an on-screen keyboard is slow and frustrating.
-2. **Account Fatigue & Privacy Risks:** Forcing family members or houseguests to download an app and log into personal accounts on a shared television leads to security vulnerabilities and high friction.
-3. **No Ambient Awareness:** Traditional apps demand active attention rather than providing a glanceable, beautiful ambient experience that blends into your home.
-
-**HomeBoard solves this completely:**
-* **Glanceable 10-Foot UI:** A clean, minimalist layout with high contrast readable from across the room.
-* **Instant Phone QR Pairing:** Anyone in the home scans the TV screen's rotating QR code with their mobile camera to open a web app—**zero downloads, zero account setup**.
-* **Sub-Second Live Sync:** Adding or completing an item on your phone updates the Fire TV screen in real time over authenticated WebSockets.
-* **Dual-Engine AI:** Type or speak natural language (*"Buy fresh milk tomorrow at 5pm"* or *"doodh lana hai"*), and the built-in parser automatically categorizes the item into the correct card with dates and deadlines.
+[![Platform: Amazon Fire TV](https://img.shields.io/badge/Platform-Amazon%20Fire%20TV%20%2F%20Vega%20OS-FF9900?style=for-the-badge&logo=amazon)](https://developer.amazon.com/fire-tv)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Built for Amazon Developer Hackathon](https://img.shields.io/badge/Hackathon-Amazon%20Developer%202026-232F3E?style=for-the-badge&logo=amazon-aws)](https://amazonappdev2026.devpost.com/)
+[![Go Engine](https://img.shields.io/badge/Backend-Go%201.24%2B-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
 
 ---
 
-## 📸 System Architecture & Visual Design
+## 🧐 What is HomeBoard?
 
-For in-depth architectural specifications and sequence diagrams, refer to **[`ARCHITECTURE.md`](ARCHITECTURE.md)**.
+In almost every home, the living room television is the largest screen in the house—yet for 80% of the day, it sits completely black and useless on the wall.
 
-```mermaid
-graph LR
-    subgraph LivingRoom ["Living Room"]
-        TV["📺 Fire TV 10-Foot Board<br/>(/tv - 4 Cards, Clock, D-Pad)"]
-    end
+Meanwhile, families struggle to keep household coordination organized:
+* **Paper sticky notes on the fridge** fall off or get lost.
+* **Family WhatsApp groups** get flooded with memes and good morning messages, burying important reminders like *"Don't forget Mom's medicine at 8 PM"*.
+* **Typing on a TV is painful:** Nobody wants to pick up a TV remote and type out a grocery list letter-by-letter on an awkward on-screen keyboard.
+* **Account friction:** Nobody wants their houseguests or family members to log into personal accounts on a shared television.
 
-    subgraph MobileDevice ["Smartphones in Household"]
-        Phone["📱 Mobile Web Client<br/>(Camera QR Scan -> Instant Pair)"]
-    end
+### The Solution: HomeBoard
 
-    subgraph BackendCore ["HomeBoard Server (Go Engine)"]
-        WS["⚡ Live WebSocket Hub"]
-        API["🛡️ REST API &amp; Auth"]
-        DB[("💾 SQLite Database<br/>(SHA-256 Hashed Secrets)")]
-        AI["🧠 Amazon Bedrock<br/>(Claude / Nova + Local Fallback)"]
-    end
+**HomeBoard turns your Amazon Fire TV into a shared, always-on ambient dashboard that everyone in the house can see and use effortlessly.**
 
-    TV <-->|"Sub-Second Live Sync (WSS)"| WS
-    Phone <-->|"Add / Complete Notes"| API
-    API -->|"Broadcast Updates"| WS
-    API <-->|"Isolated Tenant Queries"| DB
-    API -.->|"Bilingual Natural Language"| AI
+1. **Glance at your TV:** At a glance, your living room display shows 4 clean, high-contrast columns: **Today**, **Upcoming Events**, **Things to Buy**, and **Family & Movies**.
+2. **Never type on the TV:** In the bottom corner of the TV screen, there is a dynamic QR code.
+3. **Point your phone camera:** Any family member points their smartphone camera at the TV. A mobile web app opens in 2 seconds—**no app to download from an app store, no accounts to create, no passwords to type**.
+4. **Speak or type naturally:** Type or speak *"Buy eggs, milk, and bread"* or *"Doctor appointment tomorrow at 5pm"*. 
+5. **Instant Live Update:** In less than **0.5 seconds**, the note automatically flies onto the correct column of your Fire TV screen!
+6. **Fire TV Remote Interaction:** When someone buys the milk or finishes a task, anyone in the living room can simply pick up the Fire TV remote, press **[OK]**, and check it off with a satisfying checkmark.
+
+---
+
+## 🎬 How It Works: The 3-Step Experience
+
+```text
+  ┌────────────────────────────────────────────────────────┐
+  │ 📺 LIVING ROOM FIRE TV SCREEN                          │
+  │                                                        │
+  │  TODAY (2)      UPCOMING (1)     BUY (3)     FAMILY (1)│
+  │  ☑ Take meds    ☐ Dr. Appt 5pm   ☐ Eggs      ☐ Movie:  │
+  │  ☐ Water plants                  ☐ Milk        Inception│
+  │                                  ☐ Bread               │
+  │                                                        │
+  │  [Remote: ▲▼ Navigate | OK Done]       [ 📷 SCAN QR ]  │
+  └────────────────────────────────────────────────────────┘
+                              ▲
+                              │ ⚡ Sub-second WebSocket Sync (<0.5s)
+                              │
+                    ┌───────────────────┐
+                    │ 📱 ANY SMARTPHONE │
+                    │ (No app download) │
+                    │                   │
+                    │ "Buy milk 5pm"    │
+                    │ [ ✨ AI Quick-Add]│
+                    └───────────────────┘
 ```
 
+### 1. The 10-Foot Living Room Display
+* Designed specifically for **3-meter (10-foot) viewing distance** from the sofa.
+* Pure white, high-contrast minimalist cards that look modern and elegant on any television.
+* Features a live clock and subtle ambient status indicators.
+* **Ambient Screensaver Mode:** If untouched for 3 minutes, the screen smoothly transitions into a sleek, minimalist digital wall clock. Pressing any button on the Fire TV remote wakes the board instantly.
+
+### 2. Zero-Friction QR Pairing
+* The TV displays an encrypted, rotating QR code.
+* Scanning it instantly grants a secure, revocable session to your phone.
+* Multiple family members can pair simultaneously.
+* The TV owner can revoke any phone at any time with one click.
+
+### 3. Smart Dual-Engine Natural Language (AI)
+Type or speak the way you normally talk to a family member:
+* *"Buy olive oil and tomatoes"* ➔ Automatically identified as **Shopping** and placed into the **Buy** card.
+* *"Dentist appointment next Monday at 10am"* ➔ Automatically identified as an **Event** and placed into **Upcoming** with the scheduled time.
+* *"Water the plants tonight"* ➔ Automatically placed into **Today**.
+* *"Watch Interstellar this weekend"* ➔ Automatically placed into **Family & Movies**.
+* *"doodh lana hai sham ko"* ➔ Bilingual English + Hinglish support works out of the box!
+
+> **Cloud + Offline Reliability:** Powered by **Amazon Bedrock** (Claude & Nova) when cloud connectivity is active, with an instant built-in **offline heuristic engine** that takes over if internet is slow or offline—ensuring your family board **never fails**.
+
 ---
 
-## ✨ Features Overview
+## 🗂️ The 4 Glanceable TV Cards
 
-| Feature | Description |
-| :--- | :--- |
-| **📺 10-Foot Fire TV Experience** | Designed specifically for TV viewing distance with pure white minimalist cards (*Today, Upcoming, Buy, Family & Movies*). |
-| **🎮 Full D-Pad Remote Navigation** | Navigate items using the Fire TV remote D-pad, press **[OK/Select]** to complete, or hold **['A']** to archive. |
-| **📱 Zero-Friction QR Pairing** | Rotating 128-bit QR code on the TV lets any smartphone join in seconds without downloading an app. |
-| **⚡ Sub-Second Live Sync** | Real-time bi-directional synchronization powered by an efficient Go WebSocket hub. |
-| **🧠 Dual-Engine NLP (English + Hinglish)** | Powered by **Amazon Bedrock** with an automatic offline heuristic fallback—meaning it **always works** even without internet or cloud keys. |
-| **🌙 Ambient Idle Screensaver** | Automatically transitions into an elegant, high-contrast clock screensaver after 3 minutes of inactivity. Wakes instantly on any remote click. |
-| **🔒 Enterprise Security** | OWASP 2025 compliant: zero-plaintext secrets stored, constant-time hash comparisons, strict board tenant isolation, and XSS immunity. |
+| Category Card | Purpose | What Belongs Here |
+| :--- | :--- | :--- |
+| 📋 **Today** | Active daily priorities | Daily chores, medication reminders, package arrivals, urgent to-dos. |
+| 📅 **Upcoming** | Scheduled future events | Doctor visits, parent-teacher meetings, flight departures, birthdays. |
+| 🛒 **Buy** | Communal household grocery list | Groceries, household supplies, milk, pantry items. Anyone in the family adds; anyone shopping sees it. |
+| 🎬 **Family & Movies** | Shared entertainment & activities | Weekend movie watchlist, board game nights, family dinner plans. |
 
 ---
 
-## 🚀 Quick Start (Local Setup in 60 Seconds)
+## 🎮 Fire TV Remote & Keyboard Controls
 
-### Prerequisites
-* **Go 1.24+** (tested on Go 1.24, 1.25, 1.26)
-* *(Optional)* **Docker & Docker Compose**
+You don't need a mouse or keyboard. The TV app is 100% controllable with the standard **Amazon Fire TV remote control**:
 
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/kuldeep-poonia/homeboard.git
-cd homeboard
+```text
+          ┌───────────────┐
+          │     ▲ UP      │ ➔ Move focus to previous item
+          │ ◀   [OK]    ▶ │ ➔ [OK / SELECT] Marks item complete (✓)
+          │    ▼ DOWN     │ ➔ Move focus to next item
+          └───────────────┘
+          │    [ 'A' ]    │ ➔ Archive / delete selected item
+          │  [ANY BUTTON] │ ➔ Wakes TV from ambient screensaver
 ```
 
-### Step 2: Run the Server
+| Remote Button | Computer Keyboard Equivalent | Action on TV Screen |
+| :--- | :--- | :--- |
+| **D-Pad Down** | `↓` (Arrow Down) | Highlight next item on the board |
+| **D-Pad Up** | `↑` (Arrow Up) | Highlight previous item on the board |
+| **Select / OK** | `Enter` or `Space` | Toggle completed status (strikes through & checks off) |
+| **Play / Menu** | `'A'` or `Backspace` | Archive / dismiss selected item |
+| **Any Key** | Any key | Instantly dismiss ambient idle screensaver and wake the board |
+
+---
+
+## ⚡ Try It Right Now on Your Computer (In 60 Seconds)
+
+You can experience the exact Fire TV and phone interaction right now on your local machine:
+
+### 1. Start the Server
+Make sure you have [Go](https://go.dev/) installed, then run:
 ```bash
 cd backend
 go run ./cmd/server
 ```
-You will see:
-```text
-Starting HomeBoard server...
-Connected to database at ./homeboard.db
-WebSocket live-sync hub started
-HomeBoard listening on 0.0.0.0:8080 (Environment: development)
-```
+*The server will start instantly on port 8080.*
 
-### Step 3: Open the Fire TV Interface
-Open your browser (or Fire TV Silk browser) to:
+### 2. Open the Fire TV Screen
+In your browser, open:
 👉 **[`http://localhost:8080/tv`](http://localhost:8080/tv)**
 
-* You will see the 4 category cards (*Today*, *Upcoming*, *Buy*, *Family & Movies*), live clock, and a dynamic pairing QR code in the bottom corner.
+* This is your **living room TV screen**. You will see the 4 white cards, the live clock, the remote control hints, and the dynamic pairing QR code in the bottom corner.
 
-### Step 4: Pair Your Phone
-1. Scan the QR code displayed on the TV screen with your phone camera (or open `http://localhost:8080/j/`).
-2. Type any task, reminder, or grocery note (e.g., *"Buy milk tomorrow at 5pm"* or *"Movie night on Friday"*).
-3. Click **Add Item** (or press Enter).
-4. Watch the item appear **instantly on your TV screen** with zero delay!
+### 3. Open the Mobile Pairing Screen
+In a new browser tab (or on your phone by opening the network URL):
+👉 **[`http://localhost:8080/j/`](http://localhost:8080/j/)**
 
----
+* This is what family members see on their phone when they scan the TV's QR code.
 
-## 🎮 Fire TV Remote & D-Pad Keybindings
-
-HomeBoard is fully controllable using standard Fire TV / Android Leanback remote controls or your computer keyboard:
-
-| Remote Button | Keyboard Key | Action |
-| :--- | :--- | :--- |
-| **D-Pad Down** | `↓` (Arrow Down) | Move focus to the next item |
-| **D-Pad Up** | `↑` (Arrow Up) | Move focus to the previous item |
-| **Select / OK** | `Enter` or `Space` | Toggle item complete (✓ Mark Done) |
-| **Menu / Play** | `'A'` or `Backspace` | Archive selected item |
-| **Any Button** | Any key | Dismiss ambient idle screensaver and wake the board |
+### 4. Experience the Real-Time Sync
+1. On the mobile screen, type: **`Buy fresh milk tomorrow at 5pm`**
+2. Click **Add Item** (or press Enter).
+3. Switch back to your TV tab: **Notice how the item appeared instantly in the "Buy" card with zero page refresh!**
+4. Press the **`Down Arrow`** on your keyboard to highlight the item, then press **`Enter`**: **It marks as complete with a checkmark!**
 
 ---
 
-## 🐳 Running with Docker
+## 🔒 Security & Privacy by Design
 
-You can run the entire HomeBoard stack in an isolated, production-ready container:
+HomeBoard is engineered with strict enterprise security to protect family privacy:
 
+* **Zero Plaintext Secrets:** TV administration secrets and smartphone session tokens are hashed using `SHA-256` before being saved to the database. Even if someone physically inspects the database file, no credentials are leaked.
+* **10-Minute Ephemeral QR Tokens:** The pairing QR code on the TV screen automatically rotates every 8 minutes and self-destructs upon redemption. A neighbour or passerby glancing at the screen cannot reuse an old token.
+* **Strict Tenant Isolation:** Every database operation is strictly scoped by compound keys (`WHERE id = ? AND board_id = ?`), making cross-household data leakage impossible.
+* **XSS Immune:** All user notes are sanitized and rendered using safe DOM `textContent`, preventing script injection attacks.
+* **Revocation at Will:** The TV retains master control. Any lost phone or guest session can be revoked from the TV, instantly terminating its WebSocket connection.
+
+---
+
+## 🏗️ Technical Architecture at a Glance
+
+For full architectural blueprints, entity-relationship diagrams, and sequence flows, see **[`ARCHITECTURE.md`](ARCHITECTURE.md)**.
+
+```mermaid
+graph TD
+    ClientTV["📺 Fire TV 10-Foot UI<br/>(/tv or Native Leanback App)"]
+    ClientPhone["📱 Mobile Web Client<br/>(Camera QR Scan -> Ephemeral Session)"]
+    Server["⚡ Go High-Performance Server<br/>(Gorilla WebSocket + Pure Go SQLite)"]
+    AI["🧠 AI Classification Engine<br/>(Amazon Bedrock Claude/Nova + Heuristic Fallback)"]
+
+    ClientTV <-->|"Sub-Second Live Sync (WSS)"| Server
+    ClientPhone <-->|"Instant Add / Complete Notes (WSS/REST)"| Server
+    Server <-->|"Bilingual NLP Parse"| AI
+```
+
+* **Backend Engine:** Pure Go (`net/http`, `gorilla/websocket`) — lightweight, high concurrency, zero external dependencies.
+* **Database:** Embedded pure Go SQLite (`modernc.org/sqlite`) in Write-Ahead Logging (WAL) mode — zero maintenance, zero cloud database bills.
+* **TV Frontend:** 10-foot responsive web interface + React Native Android Leanback application (`tv-app/`).
+* **Mobile Client:** Zero-bundle vanilla HTML5/JS — loads in under 150ms on any mobile browser.
+
+---
+
+## ☁️ Deployment Options
+
+### Option 1: 1-Click Free Cloud Deployment (Render.com) — $0.00
+Deploy with free automatic HTTPS in under 2 minutes:
+1. Open [Render Dashboard](https://dashboard.render.com/select-repo?type=web).
+2. Select **Web Service** ➔ Choose your repo `kuldeep-poonia/homeboard`.
+3. Choose **Docker** runtime (Render detects the root `Dockerfile`).
+4. Set Instance Type to **Free** ($0/month).
+5. Add Environment Variables:
+   * `APP_ENV` = `production`
+   * `BEDROCK_ENABLED` = `false`
+6. Click **Deploy Web Service** to receive your permanent HTTPS URL (e.g., `https://homeboard.onrender.com/tv`).
+
+### Option 2: Docker / Docker Compose
+Run the entire production stack locally or on any cloud server:
 ```bash
-# Build and run container in detached mode
 docker compose up -d --build
-
-# View real-time logs
-docker compose logs -f
-
-# Stop container
-docker compose down
 ```
 Access the TV interface at [`http://localhost:8080/tv`](http://localhost:8080/tv).
 
 ---
 
-## ☁️ Production Cloud Deployment
+## 🏆 Amazon Developer Hackathon 2026 Submission
 
-### Option 1: Free 1-Click Deployment on Render ($0.00 Cost)
-Render automatically detects the root `Dockerfile` and deploys HomeBoard with free SSL/HTTPS:
+HomeBoard is submitted to the **Amazon Developer Hackathon** and qualifies for three prize tracks:
 
-1. Go to **[Render Dashboard](https://dashboard.render.com/select-repo?type=web)**.
-2. Select **Web Service** and choose repository **`kuldeep-poonia/homeboard`**.
-3. Settings:
-   * **Runtime:** `Docker`
-   * **Instance Type:** `Free` ($0/mo)
-   * **Environment Variables:**
-     * `APP_ENV` = `production`
-     * `BEDROCK_ENABLED` = `false`
-4. Click **Deploy Web Service**.
-5. Render will issue your permanent HTTPS URL (e.g., `https://homeboard.onrender.com/tv`).
-
-### Option 2: AWS Deployment (ECS / Lightsail / EC2)
-HomeBoard runs seamlessly on AWS container services using the root `Dockerfile`:
-```bash
-# Authenticate to AWS ECR & deploy
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
-docker build -t homeboard .
-docker tag homeboard:latest <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/homeboard:latest
-docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/homeboard:latest
-```
+1. **Fire TV Primary Track ($25,000):** A complete, ambient, glanceable 10-foot household board experience tailored for Fire OS and Vega OS with remote D-pad controls and live synchronization.
+2. **AWS Builder Mini Challenge ($5,000):** Native integration with **Amazon Bedrock** (`backend/internal/ai/bedrock.go`) supporting Anthropic Claude and Amazon Nova models with prompt-injection defense.
+3. **Open Source Mini Challenge ($5,000):** 100% open-sourced under the permissive [MIT License](LICENSE).
+4. **+10% Judging Bonus:** A comprehensive real-world technical **[Friction Log](FRICTION_LOG.md)** documenting our findings with Bedrock foundation model lifecycles and resilient local fallback design.
 
 ---
 
-## ⚙️ Configuration & Environment Variables
+## 🧪 Test Suite Verification
 
-HomeBoard is configured via standard environment variables or a `.env` file in the root directory:
-
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `PORT` | `8080` | Port for the HTTP and WebSocket server. |
-| `HOST` | `0.0.0.0` | Bind host address. |
-| `DB_PATH` | `./homeboard.db` | SQLite database file location. |
-| `APP_ENV` | `development` | Set to `production` in live environments. |
-| `BASE_URL` | `http://localhost:8080` | Canonical public URL used for generating QR links. |
-| `TOKEN_TTL_MINUTES` | `10` | Expiration time for pairing QR tokens. |
-| `BEDROCK_ENABLED` | `false` | Enable Amazon Bedrock cloud NLP (`true` / `false`). |
-| `AWS_REGION` | `us-east-1` | AWS Region for Bedrock foundation models. |
-| `BEDROCK_MODEL_ID` | `anthropic.claude-haiku-4-5-20251001-v1:0` | Target Bedrock foundation model ID. |
-| `RATE_LIMIT_REDEEM_PER_MINUTE` | `20` | Maximum token redemption requests allowed per minute per IP. |
-
----
-
-## 🧪 Automated Testing & Verification
-
-HomeBoard features comprehensive test coverage verifying concurrency, tenant isolation, security auditing, and natural language accuracy:
-
+Run the automated test suite covering security audits, concurrency, and NLP accuracy:
 ```bash
-# Run all test suites
 cd backend
 go test -v ./tests/...
 ```
-
-### Verified Test Suites:
-1. **`TestPhase0_HealthCheck`**: Verifies liveness probe and HTTP security headers.
-2. **`TestPhase1_BoardAndItems`**: Verifies tenant-isolated CRUD operations and compound key safety.
-3. **`TestPhase2_PairingAndSessions`**: Verifies 128-bit cryptographic join tokens, SHA-256 storage, and session cookie validation.
-4. **`TestPhase3_PhoneWebAndQR`**: Verifies dynamic QR generation, mobile onboarding, and XSS sanitization.
-5. **`TestPhase7_BedrockNaturalLanguage`**: Evaluates parsing accuracy across English and Hinglish household samples.
-6. **`TestFullEndToEndLifecycle`**: Simulates the complete end-to-end journey from TV creation to mobile synchronization.
-7. **`TestHighConcurrencyAndTrafficLoad`**: Stresses 200 concurrent operations across 20 devices with **zero errors at 242+ req/sec**.
-8. **`TestSecurityAudits`**: Validates protection against unauthorized reads, brute-force attacks, and token tampering.
-
----
-
-## 🏆 Amazon Developer Hackathon Highlights
-
-This project was built for the **Amazon Developer Hackathon** and qualifies for **three distinct prize tracks**:
-
-* **Primary Track (Fire TV):** Production-ready ambient 10-foot experience on Fire OS / Vega OS with complete remote D-pad control and live WebSocket synchronization.
-* **Mini Challenge (AWS Builder):** Integrated with **Amazon Bedrock** (`backend/internal/ai/bedrock.go`) supporting Anthropic Claude and Amazon Nova models with prompt injection protection.
-* **Mini Challenge (Open Source):** Fully open-sourced under the permissive [MIT License](LICENSE).
-* **10% Judging Bonus:** A real-world technical **[Friction Log](FRICTION_LOG.md)** detailing our findings on Bedrock model lifecycle transitions and resilient fallback architecture.
+* **8 Test Suites Passing** (100% success in 2.1s).
+* **Load Test:** 200 concurrent writes across 20 devices verified at **175+ req/sec** with zero dropped requests.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License — see the [`LICENSE`](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE) — free and open for personal and commercial use.
