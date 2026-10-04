@@ -8,6 +8,12 @@
 [![Built for Amazon Developer Hackathon](https://img.shields.io/badge/Hackathon-Amazon%20Developer%202026-232F3E?style=for-the-badge&logo=amazon-aws)](https://amazonappdev2026.devpost.com/)
 [![Go Engine](https://img.shields.io/badge/Backend-Go%201.24%2B-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
 
+> 🚀 **Live Interactive Demo (Try It Right Now):**
+> * 📺 **Fire TV 10-Foot Dashboard:** **[https://homeboard-ktss.onrender.com/tv](https://homeboard-ktss.onrender.com/tv)**
+> * 📱 **Mobile Quick-Add & Pairing:** **[https://homeboard-ktss.onrender.com/j/](https://homeboard-ktss.onrender.com/j/)**
+> 
+> *Tip: Open the TV dashboard link on your computer or Fire TV, scan the QR code in the bottom corner with your smartphone camera, and watch notes fly onto the TV screen live in <0.5s!*
+
 ---
 
 ## 🧐 What is HomeBoard?
@@ -103,7 +109,7 @@ You do **not** need complex developer tools to use HomeBoard in your living room
 Every Amazon Fire TV has Amazon's built-in **Silk Browser** (Internet):
 
 1. **Open Silk Browser:** Press and hold the Alexa microphone button on your Fire TV remote and say: **"Alexa, open Silk Browser"** (or click the *Internet* app on the Fire TV Home Screen).
-2. **Enter Your URL:** In the address bar, type your live HomeBoard URL (e.g., `https://homeboard.onrender.com/tv`).
+2. **Enter Your URL:** In the address bar, type your live HomeBoard URL: **`https://homeboard-ktss.onrender.com/tv`**.
 3. **Full Screen & Pin to Home:**
    * Press the **Menu button** (three horizontal lines `☰`) on your Fire TV remote and select **Full Screen**.
    * Click **"Pin to Home"** or **"Add Bookmark"** so HomeBoard appears right on your Fire TV home screen like a native app.
@@ -154,35 +160,31 @@ You don't need a mouse or keyboard. The TV app is 100% controllable with the sta
 
 ---
 
-## ⚡ Try It Right Now on Your Computer (In 60 Seconds)
+## ⚡ Try It Right Now (In 60 Seconds)
 
-You can experience the exact Fire TV and phone interaction right now on your local machine:
+You can experience the exact Fire TV and phone interaction right now using either the live cloud demo or running locally:
 
-### 1. Start the Server
-Make sure you have [Go](https://go.dev/) installed, then run:
-```bash
-cd backend
-go run ./cmd/server
-```
-*The server will start instantly on port 8080.*
+### Option A: Instant Live Cloud Demo (No Installation Required!)
+1. **Open the Fire TV Screen on your laptop or TV:**
+   👉 **[`https://homeboard-ktss.onrender.com/tv`](https://homeboard-ktss.onrender.com/tv)**
+   *(You will see the 4 white cards, the live clock, and the dynamic pairing QR code).*
+2. **Open the Mobile Quick-Add on your phone:**
+   👉 **[`https://homeboard-ktss.onrender.com/j/`](https://homeboard-ktss.onrender.com/j/)**
+   *(Or simply point your smartphone camera at the QR code on the TV screen!)*
+3. **Add an item:** Type `Buy fresh milk tomorrow at 5pm` and click **Add Item**.
+4. **Watch the TV screen:** The item appears in the **Buy** column in <0.5s! Press `↓` and `Enter` on your keyboard to mark it complete (✓).
 
-### 2. Open the Fire TV Screen
-In your browser, open:
-👉 **[`http://localhost:8080/tv`](http://localhost:8080/tv)**
+---
 
-* This is your **living room TV screen**. You will see the 4 white cards, the live clock, the remote control hints, and the dynamic pairing QR code in the bottom corner.
-
-### 3. Open the Mobile Pairing Screen
-In a new browser tab (or on your phone by opening the network URL):
-👉 **[`http://localhost:8080/j/`](http://localhost:8080/j/)**
-
-* This is what family members see on their phone when they scan the TV's QR code.
-
-### 4. Experience the Real-Time Sync
-1. On the mobile screen, type: **`Buy fresh milk tomorrow at 5pm`**
-2. Click **Add Item** (or press Enter).
-3. Switch back to your TV tab: **Notice how the item appeared instantly in the "Buy" card with zero page refresh!**
-4. Press the **`Down Arrow`** on your keyboard to highlight the item, then press **`Enter`**: **It marks as complete with a checkmark!**
+### Option B: Run Locally on Your Computer
+1. Start the Go server:
+   ```bash
+   cd backend
+   go run ./cmd/server
+   ```
+2. Open the TV screen: **[`http://localhost:8080/tv`](http://localhost:8080/tv)**
+3. Open the mobile pairing screen: **[`http://localhost:8080/j/`](http://localhost:8080/j/)**
+4. Experience real-time sub-second synchronization!
 
 ---
 
