@@ -536,11 +536,17 @@ func tvHTML(baseURL string) string {
     function renderCards() {
       const active = items.filter(it => !it.archived);
 
+      const buyItems = active.filter(it => it.type === 'shopping' || it.type === 'buy');
+      const upcomingItems = active.filter(it => it.type === 'event' || it.type === 'upcoming');
+      const familyItems = active.filter(it => it.type === 'movie' || it.type === 'family');
+      const otherIds = new Set([...buyItems.map(i => i.id), ...upcomingItems.map(i => i.id), ...familyItems.map(i => i.id)]);
+      const todayItems = active.filter(it => !otherIds.has(it.id));
+
       const catMap = {
-        today: active.filter(it => it.type === 'reminder' || it.type === 'status'),
-        upcoming: active.filter(it => it.type === 'event'),
-        buy: active.filter(it => it.type === 'shopping'),
-        family: active.filter(it => it.type === 'movie')
+        today: todayItems,
+        upcoming: upcomingItems,
+        buy: buyItems,
+        family: familyItems
       };
 
       focusableItems = [];

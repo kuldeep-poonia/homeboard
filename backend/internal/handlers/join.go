@@ -188,14 +188,14 @@ func phoneWebHTML(initialToken string) string {
 
   <section class="panel" id="addPanel">
     <div class="type-grid">
-      <button type="button" class="type-btn active" data-type="reminder">Reminder</button>
-      <button type="button" class="type-btn" data-type="shopping">Shopping</button>
-      <button type="button" class="type-btn" data-type="event">Event</button>
-      <button type="button" class="type-btn" data-type="movie">Movie</button>
-      <button type="button" class="type-btn ai" data-type="auto">✨ AI Auto</button>
+      <button type="button" class="type-btn ai active" data-type="auto">✨ Smart AI</button>
+      <button type="button" class="type-btn" data-type="shopping">🛒 Buy</button>
+      <button type="button" class="type-btn" data-type="event">📅 Upcoming</button>
+      <button type="button" class="type-btn" data-type="movie">🎬 Family</button>
+      <button type="button" class="type-btn" data-type="reminder">📋 Today</button>
     </div>
     <form id="itemForm" class="input-group">
-      <input type="text" id="itemTextInput" placeholder="Add note or type naturally..." maxlength="200" autocomplete="off" required>
+      <input type="text" id="itemTextInput" placeholder="Type naturally: 'Buy milk', 'Movie Friday', 'Doctor 4pm'..." maxlength="200" autocomplete="off" required>
       <button type="submit" id="btnSubmit" class="btn-send">
         <span>Post to TV</span>
       </button>
@@ -212,9 +212,17 @@ func phoneWebHTML(initialToken string) string {
 
   <script>
     let currentBoardId = null;
-    let selectedType = "reminder";
+    let selectedType = "auto";
     let ws = null;
     const initialToken = "` + initialToken + `";
+
+    const placeholders = {
+      auto: "Type naturally: 'Buy milk & eggs', 'Doctor Friday 4pm'...",
+      shopping: "Add to Buy list (e.g. Milk, Sourdough, Apples)...",
+      event: "Add to Upcoming (e.g. Doctor appointment, Flight)...",
+      movie: "Add to Family (e.g. Movie night Interstellar)...",
+      reminder: "Add to Today (e.g. Pay electricity bill, Water plants)..."
+    };
 
     const banner = document.getElementById("msgBanner");
     const connStatus = document.getElementById("connStatus");
@@ -240,6 +248,7 @@ func phoneWebHTML(initialToken string) string {
         document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         selectedType = btn.getAttribute("data-type");
+        itemInput.placeholder = placeholders[selectedType] || placeholders.auto;
         itemInput.focus();
       });
     });
@@ -374,6 +383,15 @@ func phoneWebHTML(initialToken string) string {
       }
     }
 
+    function clientClassify(input) {
+      const lower = input.toLowerCase();
+      if (/\b(movie|film|cinema|theatre|theater|watch|dekhna|dekhni|netflix|prime|hotstar|disney|hbo|youtube|series|season|episode|show|anime|popcorn|stream|documentary)\b/i.test(lower)) return "movie";
+      if (/\b(buy|purchase|bought|get|order|bring|groceries|grocery|market|shopping|supermarket|bazaar|ration|saman|saaman|khareedna|khareed|lana|mangwana|sabzi|doodh|milk|bread|eggs|egg|butter|cheese|paneer|curd|dahi|fruits|fruit|apple|apples|banana|bananas|vegetables|veggies|potato|potatoes|onion|onions|tomato|tomatoes|aloo|aalu|pyaz|tamatar|dal|daal|rice|chawal|atta|flour|oil|tel|sugar|cheeni|salt|namak|tea|chai|coffee|snacks|chips|biscuit|biscuits|soap|shampoo|toothpaste|detergent)\b/i.test(lower)) return "shopping";
+      if (/\b(event|party|birthday|bday|wedding|shaadi|anniversary|meeting|meet|doctor|dentist|appointment|clinic|hospital|flight|train|bus|ticket|travel|trip|tour|concert|match|game|tournament|interview|call|webinar|class|exam|test|session|gym|workout|dinner|lunch|brunch|puja|pooja|annual|conference)\b/i.test(lower)) return "event";
+      if (/\b(status|mode|wifi|wi-fi|router|gate|door|lock|locked|battery|charge|alarm|lights|light|fan|ac|temperature|temp|cooler|heater|chalu|band)\b/i.test(lower)) return "status";
+      return "reminder";
+    }
+
     itemForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = itemInput.value.trim();
@@ -386,16 +404,22 @@ func phoneWebHTML(initialToken string) string {
         let whenTS = null;
 
         if (selectedType === "auto") {
-          const parseRes = await fetch("/v1/boards/" + currentBoardId + "/parse", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: text })
-          });
-          if (parseRes.ok) {
-            const parsed = await parseRes.json();
-            postType = parsed.type || "reminder";
-            postText = parsed.text || text;
-            whenTS = parsed.when_ts;
+          try {
+            const parseRes = await fetch("/v1/boards/" + currentBoardId + "/parse", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: text })
+            });
+            if (parseRes.ok) {
+              const parsed = await parseRes.json();
+              postType = parsed.type || "reminder";
+              postText = parsed.text || text;
+              whenTS = parsed.when_ts;
+            } else {
+              postType = clientClassify(text);
+            }
+          } catch (e) {
+            postType = clientClassify(text);
           }
         }
 

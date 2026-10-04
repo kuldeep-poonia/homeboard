@@ -168,16 +168,16 @@ func (p *Parser) heuristicParse(input string) *ParseResult {
 	lower := strings.ToLower(input)
 
 	// Shopping keywords (English + Hindi/Hinglish)
-	shoppingPattern := regexp.MustCompile(`\b(buy|purchase|groceries|grocery|market|shopping|milk|bread|eggs|fruits|vegetables|khareedna|lana|sabzi|doodh)\b`)
+	shoppingPattern := regexp.MustCompile(`(?i)\b(buy|purchase|groceries|grocery|market|shopping|supermarket|bazaar|ration|saman|saaman|khareedna|khareed|lana|mangwana|sabzi|doodh|milk|bread|eggs|egg|butter|cheese|paneer|curd|dahi|fruits|fruit|apple|apples|banana|bananas|vegetables|veggies|potato|potatoes|onion|onions|tomato|tomatoes|aloo|aalu|pyaz|tamatar|dal|daal|rice|chawal|atta|flour|oil|tel|sugar|cheeni|salt|namak|tea|chai|coffee|snacks|chips|biscuit|biscuits|soap|shampoo|toothpaste|detergent)\b`)
 
 	// Movie / Watch keywords
-	moviePattern := regexp.MustCompile(`\b(movie|film|watch|cinema|netflix|prime|series|show|episode|dekhna|dekhni)\b`)
+	moviePattern := regexp.MustCompile(`(?i)\b(movie|film|cinema|theatre|theater|watch|dekhna|dekhni|netflix|prime|hotstar|disney|hbo|youtube|series|season|episode|show|anime|popcorn|stream|documentary)\b`)
 
 	// Event keywords
-	eventPattern := regexp.MustCompile(`\b(event|party|birthday|wedding|meeting|doctor|dentist|appointment|match|flight|train|concert|shaadi|annual)\b`)
+	eventPattern := regexp.MustCompile(`(?i)\b(event|party|birthday|bday|wedding|shaadi|anniversary|meeting|meet|doctor|dentist|appointment|clinic|hospital|flight|train|bus|ticket|travel|trip|tour|concert|match|game|tournament|interview|call|webinar|class|exam|test|session|gym|workout|dinner|lunch|brunch|puja|pooja|annual|conference)\b`)
 
 	// Status keywords
-	statusPattern := regexp.MustCompile(`\b(status|mode|wifi|gate|door|battery|alarm|lights|temperature|chalu|band)\b`)
+	statusPattern := regexp.MustCompile(`(?i)\b(status|mode|wifi|wi-fi|router|gate|door|battery|alarm|lights|temperature|chalu|band)\b`)
 
 	detectedType := "reminder"
 	switch {
