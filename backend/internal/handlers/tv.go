@@ -382,13 +382,19 @@ func tvHTML(baseURL string) string {
     </div>
 
     <div class="qr-container">
-      <div class="qr-box">
-        <img id="qrImage" class="qr-img" src="" alt="Pairing QR">
+      <div class="qr-box" id="qrBox" style="display:flex; align-items:center; justify-content:center;">
+        <svg id="qrPlaceholder" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <img id="qrImage" class="qr-img" src="" alt="Pairing QR" style="display:none;" onload="this.style.display='block'; const ph=document.getElementById('qrPlaceholder'); if(ph) ph.style.display='none';" onerror="this.style.display='none'; const ph=document.getElementById('qrPlaceholder'); if(ph) ph.style.display='block';">
       </div>
       <div class="qr-details">
         <h4>Instant Phone Sync</h4>
         <p>Scan with mobile camera to add</p>
-        <div id="qrTimer" class="qr-timer">Rotating in 8m 00s</div>
+        <div id="qrTimer" class="qr-timer">Connecting...</div>
       </div>
     </div>
   </footer>
@@ -402,6 +408,7 @@ func tvHTML(baseURL string) string {
     let ws = null;
     let idleTimer = null;
     let qrSecondsLeft = 480;
+    let isRecreatingBoard = false;
 
     const clockTime = document.getElementById("clockTime");
     const clockDate = document.getElementById("clockDate");
@@ -441,10 +448,31 @@ func tvHTML(baseURL string) string {
     window.addEventListener("mousemove", resetIdle);
     resetIdle();
 
-    async function initBoard() {
-      if (!boardId || !tvSecret) {
+    async function recoverStaleBoard() {
+      if (isRecreatingBoard) return;
+      isRecreatingBoard = true;
+      console.warn("Stale board session detected, creating new board...");
+      localStorage.removeItem("homeboard_tv_bid");
+      localStorage.removeItem("homeboard_tv_sec");
+      boardId = null;
+      tvSecret = null;
+      if (ws) {
+        try { ws.onclose = null; ws.close(); } catch (e) {}
+        ws = null;
+      }
+      await initBoard(true);
+      isRecreatingBoard = false;
+    }
+
+    async function initBoard(forceNew) {
+      if (forceNew || !boardId || !tvSecret) {
         try {
           const res = await fetch("/v1/boards", { method: "POST" });
+          if (!res.ok) {
+            console.error("Board create failed", res.status);
+            setTimeout(() => initBoard(forceNew), 2000);
+            return;
+          }
           const data = await res.json();
           boardId = data.board_id;
           tvSecret = data.tv_secret;
@@ -452,6 +480,7 @@ func tvHTML(baseURL string) string {
           localStorage.setItem("homeboard_tv_sec", tvSecret);
         } catch (e) {
           console.error("Board init error", e);
+          setTimeout(() => initBoard(forceNew), 2000);
           return;
         }
       }
@@ -461,6 +490,7 @@ func tvHTML(baseURL string) string {
     }
 
     async function refreshQRToken() {
+      if (!boardId || !tvSecret) return;
       try {
         const res = await fetch("/v1/boards/" + boardId + "/join-tokens", {
           method: "POST",
@@ -470,6 +500,8 @@ func tvHTML(baseURL string) string {
           const data = await res.json();
           qrImage.src = "/qr/" + data.token + ".png";
           qrSecondsLeft = 480;
+        } else if (res.status === 401 || res.status === 404) {
+          await recoverStaleBoard();
         }
       } catch (e) {
         console.error("QR token error", e);
@@ -485,6 +517,7 @@ func tvHTML(baseURL string) string {
     }, 1000);
 
     async function fetchItems() {
+      if (!boardId || !tvSecret) return;
       try {
         const res = await fetch("/v1/boards/" + boardId + "/items", {
           headers: { "X-TV-Secret": tvSecret }
@@ -492,6 +525,8 @@ func tvHTML(baseURL string) string {
         if (res.ok) {
           items = await res.json();
           renderCards();
+        } else if (res.status === 401 || res.status === 404) {
+          await recoverStaleBoard();
         }
       } catch (e) {
         console.error("Fetch items error", e);
@@ -627,6 +662,11 @@ func tvHTML(baseURL string) string {
     });
 
     function connectWebSocket() {
+      if (!boardId || !tvSecret) return;
+      if (ws) {
+        try { ws.onclose = null; ws.close(); } catch (e) {}
+        ws = null;
+      }
       const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = proto + "//" + window.location.host + "/v1/boards/" + boardId + "/ws?tv_secret=" + encodeURIComponent(tvSecret);
 
@@ -644,11 +684,17 @@ func tvHTML(baseURL string) string {
           }
         } catch (e) {}
       };
-      ws.onclose = () => {
+      ws.onclose = (event) => {
         statusDot.style.background = "#FF9900";
         statusText.textContent = "RECONNECTING";
         statusText.style.color = "#FF9900";
-        setTimeout(connectWebSocket, 3000);
+        if (event && (event.code === 4001 || event.code === 4004 || event.code === 1008)) {
+          recoverStaleBoard();
+          return;
+        }
+        setTimeout(() => {
+          if (boardId && tvSecret && !isRecreatingBoard) connectWebSocket();
+        }, 3000);
       };
     }
 

@@ -55,9 +55,9 @@ func NewRouter(cfg *config.Config, database *db.DB, hub *ws.Hub) http.Handler {
 	// 5. Token redemption
 	mux.HandleFunc("/v1/join/redeem", joinH.Redeem)
 
-	// 5. REST & WebSocket board routes
-	mux.HandleFunc("/v1/boards/", func(w http.ResponseWriter, r *http.Request) {
-		path := strings.TrimPrefix(r.URL.Path, "/v1/boards/")
+	boardDispatch := func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/v1/boards")
+		path = strings.TrimPrefix(path, "/")
 		parts := strings.Split(strings.Trim(path, "/"), "/")
 
 		if len(parts) >= 2 {
@@ -79,7 +79,10 @@ func NewRouter(cfg *config.Config, database *db.DB, hub *ws.Hub) http.Handler {
 
 		// Root /v1/boards
 		boardH.HandleBoardRoute(w, r)
-	})
+	}
+
+	mux.HandleFunc("/v1/boards", boardDispatch)
+	mux.HandleFunc("/v1/boards/", boardDispatch)
 
 	// Wrap entire router with security headers, body limit (64KB), and logging
 	handler := middleware.SecurityHeaders(mux)

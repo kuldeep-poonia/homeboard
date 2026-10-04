@@ -149,8 +149,8 @@ func (h *BoardHandler) RevokeDevice(w http.ResponseWriter, r *http.Request, boar
 
 // Helper to route board sub-paths
 func (h *BoardHandler) HandleBoardRoute(w http.ResponseWriter, r *http.Request) {
-	// Path pattern: /v1/boards/{id}/...
-	path := strings.TrimPrefix(r.URL.Path, "/v1/boards/")
+	path := strings.TrimPrefix(r.URL.Path, "/v1/boards")
+	path = strings.TrimPrefix(path, "/")
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 
 	if len(parts) == 0 || parts[0] == "" {
