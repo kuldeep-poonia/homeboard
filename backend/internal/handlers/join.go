@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"net"
 	"net/http"
 	"strings"
 
@@ -40,8 +41,11 @@ func (h *JoinHandler) Redeem(w http.ResponseWriter, r *http.Request) {
 
 	// Rate limit by client IP
 	clientIP := r.RemoteAddr
+	if host, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
+		clientIP = host
+	}
 	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
-		clientIP = strings.Split(forwarded, ",")[0]
+		clientIP = strings.TrimSpace(strings.Split(forwarded, ",")[0])
 	}
 	if !h.redeemLimiter.Allow("ip:" + clientIP) {
 		middleware.JSONError(w, "too many redemption attempts: try again later", http.StatusTooManyRequests)
