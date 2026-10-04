@@ -535,12 +535,11 @@ func TestPhase7_BedrockNaturalLanguage(t *testing.T) {
 	}
 
 	// Benchmark: run against 20 benchmark test cases (English + Hinglish)
-	sampleData, err := os.ReadFile("../../docs/parse_samples.json")
+	sampleData, err := os.ReadFile("parse_samples.json")
 	if err != nil {
-		// Try local relative path if run from tests dir
-		sampleData, err = os.ReadFile("../docs/parse_samples.json")
+		sampleData, err = os.ReadFile("backend/tests/parse_samples.json")
 		if err != nil {
-			sampleData, _ = os.ReadFile("docs/parse_samples.json")
+			sampleData, _ = os.ReadFile("../tests/parse_samples.json")
 		}
 	}
 

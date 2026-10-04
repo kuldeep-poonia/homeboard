@@ -156,8 +156,15 @@ Render automatically detects the root `Dockerfile` and deploys HomeBoard with fr
 4. Click **Deploy Web Service**.
 5. Render will issue your permanent HTTPS URL (e.g., `https://homeboard.onrender.com/tv`).
 
-### Option 2: AWS Deployment (App Runner / ECS / EC2)
-For full AWS cloud deployment instructions, IAM policies, and cost controls, read **[`docs/AWS_DEPLOYMENT.md`](docs/AWS_DEPLOYMENT.md)**.
+### Option 2: AWS Deployment (ECS / Lightsail / EC2)
+HomeBoard runs seamlessly on AWS container services using the root `Dockerfile`:
+```bash
+# Authenticate to AWS ECR & deploy
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+docker build -t homeboard .
+docker tag homeboard:latest <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/homeboard:latest
+docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/homeboard:latest
+```
 
 ---
 
