@@ -27,7 +27,7 @@ Living rooms have large television screens that sit idle for hours. Existing dig
 
 ## 📸 System Architecture & Visual Design
 
-For in-depth architectural specifications and sequence diagrams, refer to **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)**.
+For in-depth architectural specifications and sequence diagrams, refer to **[`ARCHITECTURE.md`](ARCHITECTURE.md)**.
 
 ```mermaid
 graph LR
@@ -209,7 +209,7 @@ This project was built for the **Amazon Developer Hackathon** and qualifies for 
 * **Primary Track (Fire TV):** Production-ready ambient 10-foot experience on Fire OS / Vega OS with complete remote D-pad control and live WebSocket synchronization.
 * **Mini Challenge (AWS Builder):** Integrated with **Amazon Bedrock** (`backend/internal/ai/bedrock.go`) supporting Anthropic Claude and Amazon Nova models with prompt injection protection.
 * **Mini Challenge (Open Source):** Fully open-sourced under the permissive [MIT License](LICENSE).
-* **10% Judging Bonus:** A real-world technical **[Friction Log](docs/FRICTION_LOG.md)** detailing our findings on Bedrock model lifecycle transitions and resilient fallback architecture.
+* **10% Judging Bonus:** A real-world technical **[Friction Log](FRICTION_LOG.md)** detailing our findings on Bedrock model lifecycle transitions and resilient fallback architecture.
 
 ---
 
