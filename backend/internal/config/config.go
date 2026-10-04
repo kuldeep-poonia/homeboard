@@ -57,7 +57,7 @@ func Load() *Config {
 
 	bedrockEnabled := strings.ToLower(getEnv("BEDROCK_ENABLED", "false")) == "true"
 	awsRegion := getEnv("AWS_REGION", "us-east-1")
-	bedrockModel := getEnv("BEDROCK_MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0")
+	bedrockModel := getEnv("BEDROCK_MODEL_ID", "anthropic.claude-haiku-4-5-20251001-v1:0")
 
 	return &Config{
 		Port:                    port,

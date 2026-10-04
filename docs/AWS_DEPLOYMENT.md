@@ -79,7 +79,7 @@ AWS App Runner automatically builds and runs your container with built-in HTTPS:
    - `APP_ENV`: `production`
    - `BEDROCK_ENABLED`: `true`
    - `AWS_REGION`: `us-east-1`
-   - `BEDROCK_MODEL_ID`: `anthropic.claude-3-haiku-20240307-v1:0`
+   - `BEDROCK_MODEL_ID`: `anthropic.claude-haiku-4-5-20251001-v1:0`
 6. Click **Deploy**. App Runner will provide a live HTTPS URL (e.g., `https://xyz123.us-east-1.awsapprunner.com`).
 
 ---
