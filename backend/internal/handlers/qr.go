@@ -34,7 +34,23 @@ func (h *QRHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	joinURL := fmt.Sprintf("%s/j/%s", h.cfg.BaseURL, token)
+	baseURL := h.cfg.BaseURL
+	// Dynamically derive public URL from request headers if BaseURL is default localhost
+	if strings.Contains(baseURL, "localhost") || strings.Contains(baseURL, "127.0.0.1") || baseURL == "" {
+		scheme := "http"
+		if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		host := r.Host
+		if xfh := r.Header.Get("X-Forwarded-Host"); xfh != "" {
+			host = xfh
+		}
+		if host != "" && !strings.Contains(host, "localhost") && !strings.Contains(host, "127.0.0.1") {
+			baseURL = fmt.Sprintf("%s://%s", scheme, host)
+		}
+	}
+
+	joinURL := fmt.Sprintf("%s/j/%s", strings.TrimRight(baseURL, "/"), token)
 
 	png, err := qrcode.Encode(joinURL, qrcode.Medium, 256)
 	if err != nil {

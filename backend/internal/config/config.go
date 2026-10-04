@@ -29,7 +29,8 @@ func Load() *Config {
 	host := getEnv("HOST", "0.0.0.0")
 	dbPath := getEnv("DB_PATH", "./homeboard.db")
 	appEnv := getEnv("APP_ENV", "development")
-	baseURL := strings.TrimRight(getEnv("BASE_URL", "http://localhost:"+port), "/")
+	defaultBase := getEnv("RENDER_EXTERNAL_URL", "http://localhost:"+port)
+	baseURL := strings.TrimRight(getEnv("BASE_URL", defaultBase), "/")
 
 	corsOriginsStr := getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080")
 	corsOrigins := strings.Split(corsOriginsStr, ",")
